@@ -1,4 +1,3 @@
-import asyncio
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -46,13 +45,13 @@ def main() -> None:
     setup_logging()
     logger.info("app_starting", model=settings.OLLAMA_MODEL)
 
-    # 2. Inicializa o banco de dados
-    asyncio.run(init_database())
-
-    # 3. Cria a aplicação do Telegram
+    # 2. Cria a aplicação do Telegram
+    # init_database() roda via post_init para garantir que usa o mesmo
+    # event loop do bot — evita "Future attached to a different loop" com asyncpg
     app = (
         ApplicationBuilder()
         .token(settings.TELEGRAM_BOT_TOKEN)
+        .post_init(lambda _app: init_database())
         .build()
     )
 
