@@ -1,0 +1,119 @@
+# ===========================================================
+# Docker Compose — Orquestração de Serviços
+#
+# Este arquivo define TODOS os containers do projeto e como eles
+# se comunicam. Com um único "docker compose up", tudo sobe.
+#
+# Serviços:
+# 1. db        → PostgreSQL (banco de dados)
+# 2. ollama    → Servidor do modelo Gemma 4
+# 3. finbot    → Nossa aplicação Python
+# ===========================================================
+
+services:
+
+  # -------------------------------------------------------
+  # BANCO DE DADOS
+  # -------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    # "alpine" é uma versão minimalista do Linux — imagem menor.
+    # postgres:16 é a versão 16 do PostgreSQL.
+
+    restart: unless-stopped
+    # Reinicia automaticamente se o container crashar,
+    # EXCETO se você parar manualmente com "docker compose stop".
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    # Variáveis de ambiente lidas do arquivo .env
+    # O PostgreSQL usa elas para criar o banco na primeira vez.
+
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Volume nomeado — os dados persistem mesmo se o container
+    # for destruído e recriado. Sem isso, perderia tudo.
+
+    ports:
+      - "5432:5432"
+    # Expõe a porta 5432 para que você possa conectar de fora
+    # do Docker (ex: com DBeaver ou pgAdmin) para inspecionar os dados.
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # Health check: a cada 10 segundos, verifica se o PostgreSQL
+    # está pronto para receber conexões. O FinBot só inicia quando
+    # este health check passa (veja depends_on abaixo).
+
+
+  # -------------------------------------------------------
+  # SERVIDOR DE MODELO (OLLAMA)
+  # -------------------------------------------------------
+  ollama:
+    image: ollama/ollama:latest
+    # Imagem oficial do Ollama. Suporta ARM64 (Pi 5).
+
+    restart: unless-stopped
+
+    ports:
+      - "11434:11434"
+
+    volumes:
+      - ollama_data:/root/.ollama
+    # Persiste os modelos baixados. Sem isso, teria que baixar
+    # o Gemma 4 (~1.5GB) toda vez que reiniciar o container.
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:11434/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+
+  # -------------------------------------------------------
+  # APLICAÇÃO FINBOT
+  # -------------------------------------------------------
+  finbot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Constrói a imagem a partir do nosso Dockerfile.
+    # "context: ." significa "use a pasta atual como contexto de build".
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+    # Carrega TODAS as variáveis do .env para dentro do container.
+
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      - OLLAMA_BASE_URL=http://ollama:11434/v1
+    # Sobrescreve as URLs para usar os nomes de serviço do Docker.
+    # Dentro da rede Docker, "db" resolve para o IP do container
+    # do PostgreSQL, e "ollama" resolve para o container do Ollama.
+    # Isso é o DNS interno do Docker Compose.
+
+    depends_on:
+      db:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    # O FinBot SÓ inicia quando tanto o banco quanto o Ollama
+    # estão saudáveis. Sem isso, o bot poderia tentar conectar
+    # ao banco antes dele estar pronto → erro na inicialização.
+
+
+# -------------------------------------------------------
+# VOLUMES PERSISTENTES
+# -------------------------------------------------------
+volumes:
+  pgdata:
+    # Armazena os dados do PostgreSQL
+  ollama_data:
+    # Armazena os modelos do Ollama

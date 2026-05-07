@@ -1,0 +1,35 @@
+# Variaveis de Ambiente
+.env
+.env.local
+.env.*.local
+.venv
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+cache/
+
+# Docker
+docker-compose.override.yml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+# OS
+.DS_Store
+Thumbs.db
+
+# Dados locais de teste
+*.db
+*.sqlite
+data/
