@@ -90,7 +90,7 @@ async def cmd_resumo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
             user_question="Faça um resumo completo dos meus gastos deste mês.",
         )
 
-    await update.message.reply_text(response)
+    await update.message.reply_text(response, parse_mode="Markdown")
 
 
 async def cmd_categorias(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -204,7 +204,7 @@ async def handler_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
             user_id=user_id,
         )
 
-        await update.message.reply_text(response)
+        await update.message.reply_text(response, parse_mode="Markdown")
 
     except Exception as e:
         latency = time.time() - start_time
@@ -286,7 +286,7 @@ async def handler_document(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             user_id=user_id,
         )
 
-        await update.message.reply_text(response)
+        await update.message.reply_text(response, parse_mode="Markdown")
 
     except Exception as e:
         latency = time.time() - start_time
@@ -348,7 +348,7 @@ async def handler_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                 user_id=user_id,
             )
 
-            await update.message.reply_text(response)
+            await update.message.reply_text(response, parse_mode="Markdown")
 
         except Exception as e:
             logger.error("extraction_failed", source="text", error=str(e))
@@ -369,7 +369,7 @@ async def handler_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                     user_question=text,
                 )
 
-            await update.message.reply_text(response)
+            await update.message.reply_text(response, parse_mode="Markdown")
 
         except Exception as e:
             logger.error("analysis_failed", error=str(e))
