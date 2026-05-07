@@ -1,6 +1,6 @@
 import io
 import time
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 from telegram import Update
 from telegram.ext import ContextTypes
 
@@ -12,6 +12,7 @@ from backend.agents.extraction_agent import (
     extract_from_pdf_text,
 )
 from backend.agents.analysis_agent import analyze_expenses
+from backend.utils.charts import generate_expense_chart
 from backend.utils.logger import get_logger
 
 logger = get_logger("bot.handlers")
@@ -67,6 +68,7 @@ async def cmd_ajuda(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "**Consultar gastos:**\n"
         "• /resumo — Resumo do mês\n"
         "• /categorias — Gastos por categoria\n"
+        "• /grafico — Gráfico visual dos gastos 📊\n"
         "• /historico — Últimos 10 gastos\n"
         "• /dica — Dica de economia\n\n"
         "**Perguntar qualquer coisa:**\n"
@@ -142,6 +144,22 @@ async def cmd_historico(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         )
 
     await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
+
+
+async def cmd_grafico(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handler do comando /grafico — envia gráfico matplotlib como foto."""
+    user_id = update.effective_user.id
+    await update.message.reply_text("📊 Gerando gráfico...")
+
+    async with AsyncSessionLocal() as session:
+        repo = ExpenseRepository(session)
+        summary = await repo.get_category_summary(telegram_user_id=user_id)
+
+    png_bytes = generate_expense_chart(summary)
+    total = sum(item["total"] for item in summary) if summary else 0.0
+    caption = f"📊 Seus gastos de {__import__('datetime').date.today().strftime('%B/%Y')} — Total: R$ {total:,.2f}"
+
+    await update.message.reply_photo(photo=png_bytes, caption=caption)
 
 
 async def cmd_dica(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

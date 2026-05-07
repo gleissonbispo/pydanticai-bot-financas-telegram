@@ -15,6 +15,7 @@ from backend.bot.handlers import (
     cmd_ajuda,
     cmd_resumo,
     cmd_categorias,
+    cmd_grafico,
     cmd_historico,
     cmd_dica,
     handler_photo,
@@ -46,7 +47,7 @@ def main() -> None:
     logger.info("app_starting", model=settings.OLLAMA_MODEL)
 
     # 2. Inicializa o banco de dados
-    asyncio.get_event_loop().run_until_complete(init_database())
+    asyncio.run(init_database())
 
     # 3. Cria a aplicação do Telegram
     app = (
@@ -64,6 +65,7 @@ def main() -> None:
     app.add_handler(CommandHandler("ajuda", cmd_ajuda))
     app.add_handler(CommandHandler("resumo", cmd_resumo))
     app.add_handler(CommandHandler("categorias", cmd_categorias))
+    app.add_handler(CommandHandler("grafico", cmd_grafico))
     app.add_handler(CommandHandler("historico", cmd_historico))
     app.add_handler(CommandHandler("dica", cmd_dica))
 

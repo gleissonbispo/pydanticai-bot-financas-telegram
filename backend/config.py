@@ -1,27 +1,23 @@
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Settings:
-    """Centraliza todas as configurações da aplicação."""
+class Settings(BaseSettings):
+    """Configurações da aplicação carregadas do ambiente / .env."""
 
-    # --- Telegram ---
-    TELEGRAM_BOT_TOKEN: str = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    # --- Banco de Dados ---
-    DATABASE_URL: str = os.environ.get(
-        "DATABASE_URL",
-        "postgresql+asyncpg://finbot:finbot@localhost:5432/finbot_db"
-    )
+    # Telegram — obrigatório, sem default (falha na init se ausente)
+    TELEGRAM_BOT_TOKEN: str
 
-    # --- Ollama ---
-    OLLAMA_BASE_URL: str = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1")
-    OLLAMA_MODEL: str = os.environ.get("OLLAMA_MODEL", "gemma4:e2b")
+    # Banco de Dados
+    DATABASE_URL: str = "postgresql+asyncpg://finbot:finbot@localhost:5432/finbot_db"
 
-    # --- Logging ---
-    LOG_LEVEL: str = os.environ.get("LOG_LEVEL", "INFO")
+    # Ollama
+    OLLAMA_BASE_URL: str = "http://localhost:11434/v1"
+    OLLAMA_MODEL: str = "gemma4:e2b"
+
+    # Logging
+    LOG_LEVEL: str = "INFO"
 
 
 settings = Settings()
