@@ -178,7 +178,7 @@ async def cmd_dica(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             ),
         )
 
-    await update.message.reply_text(response)
+    await update.message.reply_text(response, parse_mode="Markdown")
 
 
 #  HANDLERS DE CONTEÚDO (texto livre, foto, documento)
