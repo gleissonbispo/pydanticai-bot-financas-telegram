@@ -1,3 +1,5 @@
+![FinBot: finanças pessoais no Telegram com LLM local](docs/capa.png)
+
 # FinBot — Bot de Finanças Pessoais com IA
 
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
@@ -37,12 +39,6 @@
 │       com R$ 320,50...                              │
 └─────────────────────────────────────────────────────┘
 ```
-
-### 📸 Registro por foto
-![Registro por foto](docs/demo/foto_registro.png)
-
-### 📊 Gráfico de gastos (/grafico)
-![Gráfico](docs/demo/grafico.png)
 
 ---
 
@@ -248,6 +244,23 @@ O bot pode receber mensagens de múltiplos usuários ao mesmo tempo. Se uma oper
 ### Por que polling e não webhook?
 
 Webhook (o Telegram envia mensagens para seu servidor) é mais eficiente, mas exige HTTPS e um domínio público. Para um bot pessoal rodando no Raspberry Pi em rede local, polling (o bot pergunta ao Telegram a cada segundo se tem mensagem nova) é a opção mais simples e funcional.
+
+---
+
+## Limitações
+
+- O roteamento entre registrar gasto e responder pergunta é por palavra-chave ("gastei", "paguei", "pix", "reais" e outras). Uma pergunta que contenha uma dessas palavras cai no fluxo de registro.
+- Não há lista de usuários autorizados. Os gastos são separados por `telegram_user_id`, mas qualquer pessoa que encontre o bot consegue usá-lo.
+- A leitura de fotos depende do modelo multimodal local. Comprovante amassado, escuro ou com vários itens pode gerar valor ou categoria errados, e não há etapa de confirmação antes de salvar.
+- PDFs são lidos com `pypdf`, que só extrai texto. Nota fiscal escaneada como imagem dentro do PDF não é interpretada.
+- Os testes cobrem o agente de extração e os gráficos (10 testes). Handlers e repositório não têm teste.
+
+## Próximos passos
+
+- Confirmação com botões (salvar, corrigir, descartar) antes de gravar um gasto extraído de foto.
+- Lista de usuários permitidos via variável de ambiente.
+- Trocar o roteamento por palavra-chave por um agente classificador.
+- Comandos para editar e apagar lançamentos.
 
 ---
 
