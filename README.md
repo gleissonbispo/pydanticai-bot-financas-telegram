@@ -262,6 +262,16 @@ Webhook (o Telegram envia mensagens para seu servidor) é mais eficiente, mas ex
 - Trocar o roteamento por palavra-chave por um agente classificador.
 - Comandos para editar e apagar lançamentos.
 
+## Autor
+
+**Gleisson Bispo**, Gerente de People Analytics. Escrevo sobre dados de pessoas, Data Science e IA aplicada a RH.
+
+- Site: [gleissonbispo.com.br](https://gleissonbispo.com.br) (projetos, artigos, radar de notícias e vagas de People Analytics)
+- Este projeto no site: [gleissonbispo.com.br/projetos/finbot-telegram-pydanticai](https://gleissonbispo.com.br/projetos/finbot-telegram-pydanticai)
+- LinkedIn: [linkedin.com/in/gleissonbispo](https://www.linkedin.com/in/gleissonbispo)
+- Newsletter: [People Analytics LAB](https://www.linkedin.com/newsletters/people-analytics-lab-7423156507271368704), no LinkedIn
+- GitHub: [@gleissonbispo](https://github.com/gleissonbispo)
+
 ---
 
 *Projeto construído como portfólio e uso pessoal. Não é código de produção — é um demonstrador de conceitos de AI Engineering com Python.*
